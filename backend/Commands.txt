@@ -1,0 +1,4 @@
+ python -m flask shell
+  set FLASK_APP=app
+  python -m flask run -h 192.168.1.10
+  python -m virtualenv Firebase
