@@ -7,7 +7,12 @@ from itertools import islice
 import numpy as np
 from flask_marshmallow import Marshmallow
 from instagramy import InstagramUser,InstagramPost
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+#using selenium for web scrapping using a web driver
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://roots:PASSWORD@localhost:3306/flask"
@@ -35,6 +40,9 @@ class ArticleSchema(ma.Schema):
 
 article_schema = ArticleSchema()
 articles_schema = ArticleSchema(many=True)
+
+
+
 
 
 @app.route("/get/<id>", methods=["GET"])
@@ -129,7 +137,25 @@ def insta(handle):
     #                         array4.append(location[3])
     #                         time_of_post.append(posts.upload_time)
     return jsonify({"privacy":user_privacy,"bio":user_bio,"website":user_website,"followers":user_followers,"UserName":user_name,"Following":user_following,"Posts":post_details})
-    
+
+def get_ytdetails():
+    option = Options()
+    option.headless = False
+    keyword = input()
+    baseUrl = f"https://youtube.com/@{keyword}/about" 
+#an input can be given for the keyword which we will search for
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))#install webdriver in the local system
+    driver.implicitly_wait(20)
+    driver.get(f"{baseUrl}")
+    subscriber_count = driver.find_element("xpath",'//*[@id="subscriber-count"]').text
+# description = driver.find_element("xpath",'//*[@id="description"]').text
+    no_of_views = driver.find_element("xpath",'//*[@id="right-column"]/yt-formatted-string[3]').text
+    Date_of_joining = driver.find_element("xpath",'//*[@id="right-column"]/yt-formatted-string[2]/span[2]').text
+    return jsonify({"subscriber count":subscriber_count,
+    "Number of Views":no_of_views,
+    "Date of Joining":Date_of_joining})
+ 
+
 
 
 
